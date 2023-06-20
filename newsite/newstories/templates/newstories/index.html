@@ -7,7 +7,7 @@
     {% for p in posts %}
         <li><h2>{{p.title}}</h2>
         <p>{{p.content|linebreaks|truncatewords:50}}</p>
-            <div class="clear"></div>/////////////////////////////////
+            <div class="clear"></div>
             <p class="link-read-post"><a href="{{ p.get_absolute_url }}">Читать историю</a> </p>
         </li>
 

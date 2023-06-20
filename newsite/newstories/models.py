@@ -21,21 +21,20 @@ class Stories(models.Model):
     def get_absolute_url(self):
         return reverse('post', kwargs={'post_id': self.pk})
 
-class LikeDislikeManager(models.Manager):
-    use_for_related_fields = True
-
-    def likes(self):
-        # Забираем queryset с записями больше 0
-        return self.get_queryset().filter(vote__gt=0)
-
-    def dislikes(self):
-        # Забираем queryset с записями меньше 0
-        return self.get_queryset().filter(vote__lt=0)
-
-    def sum_rating(self):
-        # Забираем суммарный рейтинг
-        reiting = self.get_queryset().aggregate(Sum('vote')).get('vote__sum')
-        return reiting or 0
+# class LikeDislikeManager(models.Manager):
+#     use_for_related_fields = True
+#
+#     def likes(self):
+#         # Забираем queryset с записями больше 0
+#         return self.get_queryset().filter(vote__gt=0)
+#
+#     def dislikes(self):
+#         # Забираем queryset с записями меньше 0
+#         return self.get_queryset().filter(vote__lt=0)
+#
+#     def sum_rating(self):
+#         # Забираем суммарный рейтинг
+#         return self.get_queryset().aggregate(Sum('vote')).get('vote__sum') or 0
 
 class LikeDislike(models.Model):
     LIKE = 1
@@ -47,14 +46,13 @@ class LikeDislike(models.Model):
     vote = models.SmallIntegerField(verbose_name="Голос", choices=VOTES)
     story = models.ForeignKey(Stories, verbose_name="История", on_delete=models.PROTECT)
 
-    objects = LikeDislikeManager()
-
-    def __str__(self):
-        return self.vote
+    # objects = LikeDislikeManager()
 
 
+    def get_absolute_url(self):
+        return reverse('likedislike', kwargs={'vote_id': self.pk})
 
 
-    # def articles(self):
-    #     return self.get_queryset().filter(content_type__model='article').order_by('-articles__pub_date')
+
+
 

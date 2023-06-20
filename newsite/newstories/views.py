@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseNotFound
+from django.db.models import Sum
 
 from .models import *
 
@@ -16,14 +17,16 @@ like_dislike = [ {'title': "Лучшие истории", 'url_name': 'best'},
 ]
 def index(request):
     posts = Stories.objects.all()
-    sum_rating = LikeDislike.objects.sum_rating()  # Получаем суммарный рейтинг
+
     context = {
         'posts': posts,
         'menu': menu,
         'title': 'Главная страница',
-        'sum_rating': sum_rating
+        'posts_selected' : 0
     }
     return render(request, 'newstories/index.html', context=context)
+
+
 
 def best_view(request):
     # Получаем список лучших историй
@@ -32,18 +35,20 @@ def best_view(request):
     context = {
         'posts': best_stories,
         'menu': menu,
-        'title': 'Лучшие истории'
+        'title': 'Лучшие истории',
+        'vote_selected': 1
     }
     return render(request, 'newstories/best.html', context=context)
 
 def worst_view(request):
     # Получаем список скучных историй (рейтинг 0)
-    worst_stories = Stories.objects.annotate(rating=Sum('likedislike__vote')).filter(rating__lt=0)
+    worst_stories = Stories.objects.annotate(rating=Sum('likedislike__vote')).order_by('-rating').filter(rating__lt=1)
 
     context = {
-        'worst_stories': worst_stories,
+        'posts': worst_stories,
         'menu': menu,
-        'title': 'Скучные истории'
+        'title': 'Скучные истории',
+        'vote_selected': -1
     }
     return render(request, 'newstories/worst.html', context=context)
 

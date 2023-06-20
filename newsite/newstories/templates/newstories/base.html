@@ -1,6 +1,5 @@
 {% load static %}
 <!DOCTYPE html>
-<html>
 <head>
     <meta charset="UTF-8">
     <title>{{ title }}</title>
@@ -10,57 +9,67 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 </head>
-<body>
 <table class="table-page" border=0 cellpadding="0" cellspacing="0">
-<tr><td valign=top>
-{% block mainmenu %}
+    <tr><td valign=top>
+        {% block mainmenu %}
 
 
-        <div class="header">
-            <ul id="mainmenu" class="mainmenu">
-                <li class="logo"><a href="{% url 'homepage' %}"><div class="logo"></div></a></li>
+            <div class="header">
+                <ul id="mainmenu" class="mainmenu">
+                    <li class="logo"><a href="{% url 'homepage' %}"><div class="logo"></div></a></li>
 
-{% for m in menu %}
-    {% if not forloop.last %}
-            <li><a href="{% url m.url_name %}">{{ m.title }}</a></li>
-        {% else %}
-            <li class="last"><a href="{% url m.url_name %}">{{ m.title }}</a> </li>
-    {% endif %}
-{% endfor %}
-            </ul>
-            <div class="clear"></div>
-        </div>
-{% endblock mainmenu %}
+                    {% for m in menu %}
+                        {% if not forloop.last %}
+                            <li><a href="{% url m.url_name %}">{{ m.title }}</a></li>
+                        {% else %}
+                            <li class="last"><a href="{% url m.url_name %}">{{ m.title }}</a> </li>
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+                <div class="clear"></div>
+            </div>
+        {% endblock mainmenu %}
 
 
-<table class="table-content" border=0 cellpadding="0" cellspacing="0">
-<tr>
-    <td valign="top" class="left-chapters">
-    <ul id="leftchapters">
-{% if vote_selected == 0 %}
-        <li class="selected">Все истории</li>
-{% else %}
-        <li><a href="{% url 'homepage' %}">Все истории</a> </li>
-{% endif %}
-<ul id="leftchapters">
-    <li><a href="{% url 'best' %}">Лучшие истории ({{ sum_rating }})</a></li>
-    <li><a href="{% url 'worst' %}">Скучные истории ({{ sum_rating }})</a></li>
+        <table class="table-content" border=0 cellpadding="0" cellspacing="0">
+            <tr>
+                <td valign="top" class="left-chapters">
+                    <ul id="leftchapters">
+                        {% if posts_selected == 0 %}
+                            <li class="selected">Все истории</li>
+                        {% else %}
+                            <li><a href="{% url 'homepage' %}">Все истории</a> </li>
+                        {% endif %}
+
+                        {% if vote_selected == 1 %}
+                            <li class="selected">Лучшие истории</li>
+                        {% else %}
+                            <a href="{% url 'best' %}">Лучшие истории</a>
+                        {% endif %}
+
+                        {% if vote_selected == -1 %}
+                            <li class="selected">Скучные истории</li>
+                        {% else %}
+                            <a href="{% url 'worst' %}">Скучные истории</a>
+                        {% endif %}
+
 </ul>
 
-    </ul>
-    </td>
-
-<td valign="top" class="content">
-    {% block breadcrumbs %}
-    {% endblock %}
-    <div class="content-text">
-{% block content %}
-{% endblock %}
-    </div>
-
-</td></tr></table>
-</td></tr>
 
 
-</body>
-</html>
+
+
+                    </ul>
+                </td>
+
+                <td valign="top" class="content">
+                    {% block breadcrumbs %}
+                    {% endblock %}
+                    <div class="content-text">
+                        {% block content %}
+                        {% endblock %}
+                    </div>
+
+                </td></tr></table>
+    </td></tr>
+</table>
