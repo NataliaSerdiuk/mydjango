@@ -1,0 +1,18 @@
+{% extends 'newstories/base.html' %}
+
+{% block breadcrumbs %}
+    <div class="breadcrumbs">
+        <a href="{% url 'homepage' %}">Главная</a> / Лучшие истории
+    </div>
+{% endblock %}
+
+{% block content %}
+    <h1>Лучшие истории</h1>
+    <ul>
+        {% for post in posts %}
+            <li><a href="{{ post.get_absolute_url }}">{{ post.title }}</a></li>
+        {% empty %}
+            <li>Нет доступных историй</li>
+        {% endfor %}
+    </ul>
+{% endblock %}

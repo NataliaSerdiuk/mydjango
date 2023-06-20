@@ -17,9 +17,9 @@ Including another URLconf
 from django.contrib import admin
 from django.conf.urls.static import static
 from django.urls import path, include
-from newstories.views import *
-from newsite import settings
 
+from newsite import settings
+from newstories.views import *
 
 urlpatterns = [
     path('admin/', admin.site.urls),
