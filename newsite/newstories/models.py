@@ -1,7 +1,5 @@
 from django.db import models
-from django.contrib.contenttypes.models import ContentType
-from django.contrib.contenttypes.fields import GenericForeignKey
-from django.contrib.contenttypes.fields import GenericRelation
+
 from django.db.models import Sum
 from django.urls import reverse
 
@@ -13,7 +11,7 @@ class Stories(models.Model):
     time_create = models.DateTimeField(auto_now_add=True, verbose_name='Дата создания')
     time_update = models.DateTimeField(auto_now=True, verbose_name='Дата обновления')
     is_published = models.BooleanField(default=True, verbose_name='Опубликовано')
-    # cat = models.ForeignKey('Categories', on_delete=models.PROTECT, null=True, verbose_name='Категории')
+
 
     def __str__(self):
         return self.title
@@ -21,20 +19,15 @@ class Stories(models.Model):
     def get_absolute_url(self):
         return reverse('post', kwargs={'post_id': self.pk})
 
-# class LikeDislikeManager(models.Manager):
-#     use_for_related_fields = True
-#
-#     def likes(self):
-#         # Забираем queryset с записями больше 0
-#         return self.get_queryset().filter(vote__gt=0)
-#
-#     def dislikes(self):
-#         # Забираем queryset с записями меньше 0
-#         return self.get_queryset().filter(vote__lt=0)
-#
-#     def sum_rating(self):
-#         # Забираем суммарный рейтинг
-#         return self.get_queryset().aggregate(Sum('vote')).get('vote__sum') or 0
+    def get_rating(self):
+        return self.likedislike_set.aggregate(rating=Sum('vote'))['rating'] or 0
+
+
+    class Meta:
+        verbose_name = 'Выдуманные истории'
+        verbose_name_plural = 'Выдуманные истории'
+        ordering = ['time_create', 'title']
+
 
 class LikeDislike(models.Model):
     LIKE = 1
@@ -43,14 +36,23 @@ class LikeDislike(models.Model):
         (DISLIKE, 'Не нравится'),
         (LIKE, 'Нравится')
     )
-    vote = models.SmallIntegerField(verbose_name="Голос", choices=VOTES)
+    vote = models.SmallIntegerField(default=0, verbose_name="Голос", choices=VOTES)
     story = models.ForeignKey(Stories, verbose_name="История", on_delete=models.PROTECT)
 
-    # objects = LikeDislikeManager()
+    class Meta:
+        verbose_name = 'Лайк/дислайк'
+        verbose_name_plural = 'Лайк/дислайк'
+
 
 
     def get_absolute_url(self):
         return reverse('likedislike', kwargs={'vote_id': self.pk})
+
+
+    def get_story(self, obj):
+        return obj.story
+
+
 
 
 
