@@ -6,6 +6,7 @@ from django.urls import reverse
 
 class Stories(models.Model):
     title = models.CharField(max_length=255, verbose_name='Название')
+    slug = models.SlugField(max_length=255, unique=True, db_index=True, verbose_name='URL')
     content = models.TextField(blank=True, verbose_name='Содержание')
     photo = models.ImageField(upload_to="photos/%Y/%m/%d/",blank=True, verbose_name='Фотография')
     time_create = models.DateTimeField(auto_now_add=True, verbose_name='Дата создания')
@@ -17,7 +18,7 @@ class Stories(models.Model):
         return self.title
 
     def get_absolute_url(self):
-        return reverse('post', kwargs={'post_id': self.pk})
+        return reverse('post', kwargs={'post_slug': self.slug})
 
     def get_rating(self):
         return self.likedislike_set.aggregate(rating=Sum('vote'))['rating'] or 0
@@ -32,25 +33,27 @@ class Stories(models.Model):
 class LikeDislike(models.Model):
     LIKE = 1
     DISLIKE = -1
+    __empty__ = 0
     VOTES = (
         (DISLIKE, 'Не нравится'),
         (LIKE, 'Нравится')
     )
-    vote = models.SmallIntegerField(default=0, verbose_name="Голос", choices=VOTES)
+    vote = models.SmallIntegerField(blank=False, default=0, verbose_name="Голос", choices=VOTES)
     story = models.ForeignKey(Stories, verbose_name="История", on_delete=models.PROTECT)
+
+
 
     class Meta:
         verbose_name = 'Лайк/дислайк'
         verbose_name_plural = 'Лайк/дислайк'
 
 
-
     def get_absolute_url(self):
         return reverse('likedislike', kwargs={'vote_id': self.pk})
 
-
     def get_story(self, obj):
         return obj.story
+
 
 
 
