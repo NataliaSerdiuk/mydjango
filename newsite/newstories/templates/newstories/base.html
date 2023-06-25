@@ -53,13 +53,13 @@
                             <a href="{% url 'worst' %}">Скучные истории</a>
                         {% endif %}
 
+                        {% if vote_selected == 0 %}
+                            <li class="selected">Неоцененные истории</li>
+                        {% else %}
+                            <br><a href="{% url 'no_vote' %}">Неоцененные истории</a>
+                        {% endif %}
+
 </ul>
-
-
-
-
-
-                    </ul>
                 </td>
 
                 <td valign="top" class="content">

@@ -1,7 +1,7 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse, HttpResponseNotFound
 
-
+from .forms import *
 from .models import *
 
 
@@ -53,12 +53,35 @@ def worst_view(request):
     }
     return render(request, 'newstories/worst.html', context=context)
 
+def no_vote(request):
+    # Получаем список неоцененных историй
+    no_vote_stories = Stories.objects.filter(likedislike__vote=None)
+
+    context = {
+        'posts': no_vote_stories,
+        'menu': menu,
+        'title': 'Неоцененные истории',
+        'vote_selected': 0
+    }
+    return render(request, 'newstories/no_vote.html', context=context)
+
 
 def about(request):
     return HttpResponse('О проекте')
 
 def addpage(request):
-    return HttpResponse('Добавить историю')
+    if request.method == 'POST':
+        form = AddPostForm(request.POST)
+        if form.is_valid():
+
+            try:
+                Stories.objects.create(**form.cleaned_data)
+                return redirect('no_vote')
+            except:
+                form.add_error(None,'Ошибка добавления')
+    else:
+        form = AddPostForm()
+    return render(request, 'newstories/addpage.html', {'form': form, 'menu': menu, 'title': 'Добавь свою историю'})
 
 def contact(request):
     return HttpResponse('Обратная связь')
@@ -69,8 +92,8 @@ def login(request):
 def pageNotFound(request, exception):
     return HttpResponseNotFound('<h1>Страница не найдена</h1>')
 
-def show_post(request, post_id):
-    post = get_object_or_404(Stories, pk=post_id)
+def show_post(request, post_slug):
+    post = get_object_or_404(Stories, slug=post_slug)
 
     context = {
         'post' : post,

@@ -9,6 +9,7 @@ class StoriesAdmin(admin.ModelAdmin):
     search_fields = ('title', 'content')
     list_editable = ('is_published',)
     list_filter = ('title','time_create', 'is_published')
+    prepopulated_fields = {"slug":("title",)}
 
     def get_rating(self, obj):
         return obj.get_rating()
