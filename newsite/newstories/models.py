@@ -5,13 +5,13 @@ from django.urls import reverse
 
 
 class Stories(models.Model):
-    title = models.CharField(max_length=255, verbose_name='Название')
+    title = models.CharField(max_length=255, verbose_name='Название истории')
     slug = models.SlugField(max_length=255, unique=True, db_index=True, verbose_name='URL')
-    content = models.TextField(blank=True, verbose_name='Содержание')
-    photo = models.ImageField(upload_to="photos/%Y/%m/%d/",blank=True, verbose_name='Фотография')
+    content = models.TextField(blank=True, verbose_name='Текст истории')
+    photo = models.ImageField(upload_to="photos/%Y/%m/%d/",blank=True, verbose_name='Фото')
     time_create = models.DateTimeField(auto_now_add=True, verbose_name='Дата создания')
     time_update = models.DateTimeField(auto_now=True, verbose_name='Дата обновления')
-    is_published = models.BooleanField(default=True, verbose_name='Опубликовано')
+    is_published = models.BooleanField(default=True, verbose_name='Опубликовать')
 
 
     def __str__(self):
@@ -33,14 +33,13 @@ class Stories(models.Model):
 class LikeDislike(models.Model):
     LIKE = 1
     DISLIKE = -1
-    __empty__ = 0
+
     VOTES = (
         (DISLIKE, 'Не нравится'),
         (LIKE, 'Нравится')
     )
-    vote = models.SmallIntegerField(blank=False, default=0, verbose_name="Голос", choices=VOTES)
+    vote = models.SmallIntegerField(verbose_name="Голос", choices=VOTES)
     story = models.ForeignKey(Stories, verbose_name="История", on_delete=models.PROTECT)
-
 
 
     class Meta:
