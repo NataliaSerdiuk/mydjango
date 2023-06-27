@@ -71,14 +71,18 @@ def about(request):
 
 def addpage(request):
     if request.method == 'POST':
-        form = AddPostForm(request.POST)
+        form = AddPostForm(request.POST, request.FILES)
         if form.is_valid():
-
-            try:
-                Stories.objects.create(**form.cleaned_data)
-                return redirect('no_vote')
-            except:
-                form.add_error(None,'Ошибка добавления')
+            # user_text = form.cleaned_data['content']
+            # user_text_list = user_text.split()
+            # with open('D:/Python/djangosite/newsite/newstories/resources/forbidden_words.txt', 'r') as file:
+            #     forbidden_words = [word.strip() for word in file.readlines()]
+            #     for word in forbidden_words:
+            #         if word in user_text_list:
+            #             raise ValidationError("Текст содержит недопустимое слово.")
+            #         else:
+            form.save()
+            return redirect('no_vote')
     else:
         form = AddPostForm()
     return render(request, 'newstories/addpage.html', {'form': form, 'menu': menu, 'title': 'Добавь свою историю'})
