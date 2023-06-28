@@ -1,5 +1,7 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse, HttpResponseNotFound
+from django.views.generic import ListView, DetailView, CreateView
+from django.urls import reverse_lazy
 
 from .forms import *
 from .models import *
@@ -11,81 +13,73 @@ menu = [ {'title': "О сайте", 'url_name': 'about'},
          {'title':"Войти на сайт", 'url_name': 'login'},
 ]
 
-like_dislike = [ {'title': "Лучшие истории", 'url_name': 'best'},
-                 {'title': "Скучные истории", 'url_name': 'worst'}
+class StoriesHomepage(ListView):
+    model = Stories
+    template_name = 'newstories/index.html'
+    context_object_name = 'posts'
 
-]
-def index(request):
-    posts = Stories.objects.all()
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['menu'] = menu
+        context['title'] = 'Главная страница'
+        return context
 
-    context = {
-        'posts': posts,
-        'menu': menu,
-        'title': 'Главная страница',
-        'posts_selected' : 0
-    }
-    return render(request, 'newstories/index.html', context=context)
+    def get_queryset(self):
+        return Stories.objects.filter(is_published = True)
 
+class StoriesBestRating(ListView):
+    model = LikeDislike
+    template_name = 'newstories/best.html'
+    context_object_name = 'posts'
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['menu'] = menu
+        context['title'] = 'Лучшие истории'
+        context['vote_selected'] = 1
+        return context
+    def get_queryset(self):
+        return Stories.objects.annotate(rating=Sum('likedislike__vote')).order_by('-rating').filter(rating__gt=0)
 
+class StoriesWorstRating(ListView):
+    model = LikeDislike
+    template_name = 'newstories/worst.html'
+    context_object_name = 'posts'
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['menu'] = menu
+        context['title'] = 'Скучные истории'
+        context['vote_selected'] = -1
+        return context
+    def get_queryset(self):
+        return Stories.objects.annotate(rating=Sum('likedislike__vote')).order_by('-rating').filter(rating__lt=1)
 
-def best_view(request):
-    # Получаем список лучших историй
-    best_stories = Stories.objects.annotate(rating=Sum('likedislike__vote')).order_by('-rating').filter(rating__gt=0)
-
-
-    context = {
-        'posts': best_stories,
-        'menu': menu,
-        'title': 'Лучшие истории',
-        'vote_selected': 1
-    }
-    return render(request, 'newstories/best.html', context=context)
-
-def worst_view(request):
-    # Получаем список скучных историй (рейтинг 0)
-    worst_stories = Stories.objects.annotate(rating=Sum('likedislike__vote')).order_by('-rating').filter(rating__lt=1)
-
-    context = {
-        'posts': worst_stories,
-        'menu': menu,
-        'title': 'Скучные истории',
-        'vote_selected': -1
-    }
-    return render(request, 'newstories/worst.html', context=context)
-
-def no_vote(request):
-    # Получаем список неоцененных историй
-    no_vote_stories = Stories.objects.filter(likedislike__vote=None)
-
-    context = {
-        'posts': no_vote_stories,
-        'menu': menu,
-        'title': 'Неоцененные истории',
-        'vote_selected': 0
-    }
-    return render(request, 'newstories/no_vote.html', context=context)
+class StoriesNoRating(ListView):
+    model = LikeDislike
+    template_name = 'newstories/no_vote.html'
+    context_object_name = 'posts'
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['menu'] = menu
+        context['title'] = 'Неоцененные истории'
+        context['vote_selected'] = 0
+        return context
+    def get_queryset(self):
+        return Stories.objects.filter(likedislike__vote=None)
 
 
 def about(request):
     return HttpResponse('О проекте')
 
-def addpage(request):
-    if request.method == 'POST':
-        form = AddPostForm(request.POST, request.FILES)
-        if form.is_valid():
-            # user_text = form.cleaned_data['content']
-            # user_text_list = user_text.split()
-            # with open('D:/Python/djangosite/newsite/newstories/resources/forbidden_words.txt', 'r') as file:
-            #     forbidden_words = [word.strip() for word in file.readlines()]
-            #     for word in forbidden_words:
-            #         if word in user_text_list:
-            #             raise ValidationError("Текст содержит недопустимое слово.")
-            #         else:
-            form.save()
-            return redirect('no_vote')
-    else:
-        form = AddPostForm()
-    return render(request, 'newstories/addpage.html', {'form': form, 'menu': menu, 'title': 'Добавь свою историю'})
+class AddPage(CreateView):
+    form_class = AddPostForm
+    template_name = 'newstories/addpage.html'
+    success_url = reverse_lazy('homepage')
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['menu'] = menu
+        context['title'] = 'Добавить историю'
+        return context
 
 def contact(request):
     return HttpResponse('Обратная связь')
@@ -96,16 +90,18 @@ def login(request):
 def pageNotFound(request, exception):
     return HttpResponseNotFound('<h1>Страница не найдена</h1>')
 
-def show_post(request, post_slug):
-    post = get_object_or_404(Stories, slug=post_slug)
 
-    context = {
-        'post' : post,
-        'menu': menu,
-        'title': post.title,
-        'posts_selected': 0
-    }
+class ShowPost(DetailView):
+    model = Stories
+    template_name = 'newstories/post.html'
+    slug_url_kwarg = 'post_slug'
+    context_object_name = 'post'
 
-    return render(request, 'newstories/post.html', context=context)
+    def get_context_data(self, *, object_list = None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['menu'] = menu
+        context['title'] = context['post']
+        return context
+
 
 

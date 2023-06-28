@@ -4,14 +4,14 @@ from django.urls import path
 from newstories.views import *
 
 urlpatterns = [
-    path('', index, name= 'homepage'),
+    path('', StoriesHomepage.as_view(), name= 'homepage'),
     path('about/', about, name= 'about'),
-    path('addpage/', addpage, name= 'add_page'),
+    path('addpage/', AddPage.as_view(), name= 'add_page'),
     path('contact/', contact, name= 'contact'),
     path('login/', login, name= 'login'),
-    path('post/<slug:post_slug>/', show_post, name= 'post'),
-    path('best/', best_view, name='best'),
-    path('worst/', worst_view, name='worst'),
-    path('no_vote', no_vote, name= 'no_vote'),
+    path('post/<slug:post_slug>/', ShowPost.as_view(), name= 'post'),
+    path('best/', StoriesBestRating.as_view(), name='best'),
+    path('worst/', StoriesWorstRating.as_view(), name='worst'),
+    path('no_vote/', StoriesNoRating.as_view(), name= 'no_vote'),
 
 ]

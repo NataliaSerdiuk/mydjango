@@ -178,7 +178,18 @@ div.button {
 	margin: 30px 0 0 0;
 	color: #999;
 }
-.left-chapters ul li.selected {color: #0059b2; }
+
+.left-chapters ul li.selected {
+    position: sticky;
+    top: 0;
+    background-color: #eee;
+}
+
+li {
+    list-style-type: none;
+	padding: 10px;
+}
+
 .left-chapters ul li a {
 	color: #444;
 	text-decoration: none;
@@ -390,3 +401,10 @@ ul.lang-list li a:hover {color: #fdc073;}
     min-width: 200px;
     font-size: 16px;
 }
+
+/*#sticky-chapters {*/
+/*    position: sticky;*/
+/*    top: 0;*/
+/*    background-color: #ffffff; !* Цвет фона для видимости *!*/
+/*    z-index: 1; !* Установите z-index, чтобы разделы были поверх остального содержимого *!*/
+/*}*/
