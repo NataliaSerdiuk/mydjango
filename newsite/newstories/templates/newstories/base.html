@@ -34,30 +34,37 @@
         <table class="table-content" border=0 cellpadding="0" cellspacing="0">
             <tr>
                 <td valign="top" class="left-chapters">
-                    <ul id="leftchapters">
-                        {% if posts_selected == 0 %}
-                            <li class="selected">Все истории</li>
-                        {% else %}
-                            <li><a href="{% url 'homepage' %}">Все истории</a> </li>
-                        {% endif %}
+                    <div id="leftchapters">
+                        <div id="sticky-chapters"></div>
+                            {% if posts_selected == 0 %}
+                                <li class="selected">Все истории</li>
+                            {% else %}
+                                <li><a href="{% url 'homepage' %}">Все истории</a> </li>
+                            {% endif %}
 
-                        {% if vote_selected == 1 %}
-                            <li class="selected">Лучшие истории</li>
-                        {% else %}
-                            <a href="{% url 'best' %}">Лучшие истории</a>
-                        {% endif %}
+                            {% if vote_selected == 1 %}
+                                <li class="selected">Лучшие истории</li>
+                            {% else %}
+                                <li><a href="{% url 'best' %}">Лучшие истории</a></li>
+                            {% endif %}
 
-                        {% if vote_selected == -1 %}
-                            <li class="selected">Скучные истории</li>
-                        {% else %}
-                            <a href="{% url 'worst' %}">Скучные истории</a>
-                        {% endif %}
+                            {% if vote_selected == -1 %}
+                                <li class="selected">Скучные истории</li>
+                            {% else %}
+                                <li><a href="{% url 'worst' %}">Скучные истории</a></li>
+                            {% endif %}
 
-                        {% if vote_selected == 0 %}
-                            <li class="selected">Неоцененные истории</li>
-                        {% else %}
-                            <br><a href="{% url 'no_vote' %}">Неоцененные истории</a>
-                        {% endif %}
+                            {% if vote_selected == 0 %}
+                                <li class="selected">Неоцененные истории</li>
+                            {% else %}
+                                <li><a href="{% url 'no_vote' %}">Неоцененные истории</a></li>
+                            {% endif %}
+
+
+
+                    </div>
+                        </div>
+                    </ul>
 
 </ul>
                 </td>
