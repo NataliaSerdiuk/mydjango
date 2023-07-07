@@ -1,11 +1,38 @@
 {% extends 'newstories/base.html' %}
 
 {% block content %}
-<h1>{{ post.title }}</h1>
+    <h1>{{ post.title }}</h1>
 
-{% if post.photo %}
-<p><img class="img-article-left" src="{{ post.photo.url }}"></p>
-{% endif %}
+    {% if post.photo %}
+        <p><img class="img-article-left" src="{{ post.photo.url }}"></p>
+    {% endif %}
 
-{{ post.content|linebreaks }}
+    {{ post.content|linebreaks }}
+
+    <p>Автор: {{ post.author }}</p>
+    <p>Рейтинг: {{ rating }}</p>
+
+    {% if request.user.is_authenticated %}
+        {% if post.author != request.user %}
+            {% if not existing_vote %}
+                <div>
+                    <form action="{% url 'likedislike' post_slug=post.slug %}" method="POST">
+                        {% csrf_token %}
+                        <button type="submit" name="vote" value="like">Нравится</button>
+                        <button type="submit" name="vote" value="dislike">Не нравится</button>
+                    </form>
+                </div>
+            {% else %}
+                <div>
+                    {% if existing_vote.vote == 1 %}
+                        <button type="button" class="btn-like btn-selected" disabled>Нравится</button>
+                        <button type="button" class="btn-dislike" disabled>Не нравится</button>
+                    {% elif existing_vote.vote == -1 %}
+                        <button type="button" class="btn-like" disabled>Нравится</button>
+                        <button type="button" class="btn-dislike btn-selected" disabled>Не нравится</button>
+                    {% endif %}
+                </div>
+            {% endif %}
+        {% endif %}
+    {% endif %}
 {% endblock %}
