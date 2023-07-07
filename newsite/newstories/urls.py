@@ -2,9 +2,10 @@ from django.urls import path
 
 
 from newstories.views import *
+from django.views.decorators.cache import cache_page
 
 urlpatterns = [
-    path('', StoriesHomepage.as_view(), name= 'homepage'),
+    path('', cache_page(60)(StoriesHomepage.as_view()), name= 'homepage'),
     path('about/', about, name= 'about'),
     path('addpage/', AddPage.as_view(), name= 'add_page'),
     path('contact/', contact, name= 'contact'),
