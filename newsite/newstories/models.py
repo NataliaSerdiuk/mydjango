@@ -1,7 +1,8 @@
 from django.db import models
-
+from django.contrib.auth.models import User
 from django.db.models import Sum
 from django.urls import reverse
+
 
 
 class Stories(models.Model):
@@ -12,6 +13,7 @@ class Stories(models.Model):
     time_create = models.DateTimeField(auto_now_add=True, verbose_name='Дата создания')
     time_update = models.DateTimeField(auto_now=True, verbose_name='Дата обновления')
     is_published = models.BooleanField(default=True, verbose_name='Опубликовать')
+    author = models.ForeignKey(User, verbose_name='Автор', on_delete=models.CASCADE)
 
 
     def __str__(self):
@@ -40,6 +42,7 @@ class LikeDislike(models.Model):
     )
     vote = models.SmallIntegerField(verbose_name="Голос", choices=VOTES)
     story = models.ForeignKey(Stories, verbose_name="История", on_delete=models.PROTECT)
+    author = models.ForeignKey(User, verbose_name='Автор', on_delete=models.CASCADE)
 
 
     class Meta:
@@ -50,13 +53,6 @@ class LikeDislike(models.Model):
     def get_absolute_url(self):
         return reverse('likedislike', kwargs={'vote_id': self.pk})
 
-    def get_story(self, obj):
-        return obj.story
-
-
-
-
-
-
-
-
+    @property
+    def get_story(self):
+        return self.story
